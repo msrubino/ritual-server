@@ -15,13 +15,16 @@ get '/leave/:id' do
 end
 
 # Game routes
-get '/declare_ritual' do
+post '/declare_ritual' do
 end
 
-get '/perform_ritual' do
+post '/perform_ritual' do
 end
 
-get '/declare_leader' do
+post '/declare_leader' do
+end
+
+post '/claimleadership' do
 end
 
 get '/sync' do
