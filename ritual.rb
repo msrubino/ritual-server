@@ -1,8 +1,7 @@
 require 'sinatra'
 require 'sinatra/activerecord'
 require './config/environments'
-require './models/ritual_player'
-
+Dir["./models/*.rb"].each {|file| require file }
 
 get '/' do
   # Show current list of users.
@@ -27,6 +26,9 @@ get '/leave' do
 end
 
 # Game routes
+post '/claimleadership' do
+end
+
 post '/declare_ritual' do
 end
 
@@ -36,7 +38,11 @@ end
 post '/declare_leader' do
 end
 
-post '/claimleadership' do
+get '/reset' do
+    Ritual.destroy_all
+    RitualPlayer.destroy_all
+    RitualGame.destroy_all
+    "All gone."
 end
 
 get '/sync' do
