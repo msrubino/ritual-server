@@ -1,7 +1,7 @@
 class CreateRitualTables < ActiveRecord::Migration
   def change
     create_table :ritual_games do |t|
-      t.integer :ritual_player_id, null: false
+      t.timestamps
     end
 
     create_table :rituals do |t|
@@ -22,7 +22,14 @@ class CreateRitualTables < ActiveRecord::Migration
       t.references :ritual_game
       t.foreign_key :ritual_games, on_delete: :cascade
 
+      t.integer :leader_id
+
       t.index :uuid, unique: true
+    end
+
+    create_table :ritual_responses do |t|
+      t.float :response_time, null: false
+      t.timestamps
     end
   end
 end

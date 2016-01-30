@@ -23,13 +23,15 @@ ActiveRecord::Schema.define(version: 20160130083104) do
   end
 
   create_table "ritual_games", force: :cascade do |t|
-    t.integer "ritual_player_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "ritual_players", force: :cascade do |t|
     t.string  "uuid",           null: false
     t.string  "name",           null: false
     t.integer "ritual_game_id"
+    t.integer "leader_id"
   end
 
   add_index "ritual_players", ["uuid"], name: "index_ritual_players_on_uuid", unique: true, using: :btree
@@ -41,6 +43,12 @@ ActiveRecord::Schema.define(version: 20160130083104) do
   end
 
   add_index "ritual_response", ["response_time"], name: "index_ritual_response_on_response_time", using: :btree
+
+  create_table "ritual_responses", force: :cascade do |t|
+    t.float    "response_time", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "rituals", force: :cascade do |t|
     t.integer  "ritual_type",    null: false
