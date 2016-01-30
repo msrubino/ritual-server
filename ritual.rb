@@ -1,13 +1,5 @@
 require 'sinatra'
 
-class Player
-  def initialize( id, name )
-    @id = id;
-    @name = name;
-  end
-end
-
-class User
 get '/' do
   "Ritual"
   # Show current list of users.
