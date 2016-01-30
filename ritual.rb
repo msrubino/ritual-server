@@ -12,14 +12,18 @@ get '/' do
 end
 
 # Player routes
-get '/join/:id' do
-  puts params[:id] + ' joined'
-  @player = RitualPlayer.create(uuid: "Hello", name: "HelloTwo")
-
+get '/join' do
+  begin
+    RitualPlayer.create(uuid: params[:uuid], name: params[:name])
+    puts "#{params[:uuid]} joined."
+  rescue
+    puts "Player #{params[:uuid]} already exists."
+  end
 end
 
-get '/leave/:id' do
-  puts params[:id] + ' left'
+get '/leave' do
+  RitualPlayer.destroy_all(uuid: params[:uuid])
+  puts "#{params[:id]} left."
 end
 
 # Game routes
