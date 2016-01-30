@@ -4,3 +4,10 @@ development:
   username: ritualuser
   password: ritualpassword
   host: localhost
+
+production:
+  adapter: postgresql
+  database: d6novngo2c8bpq
+  username: fbbjkfkagqguww
+  password: 4-nybJtRhfikpIhQF_pnjRsjki
+  host: ec2-54-225-195-249.compute-1.amazonaws.com

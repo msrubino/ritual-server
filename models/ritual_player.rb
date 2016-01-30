@@ -3,3 +3,4 @@ class RitualPlayer < ActiveRecord::Base
   
   validates :uuid, presence: true
   validates :name, presence: true
+end

@@ -1,22 +1,21 @@
 require 'sinatra'
 require 'sinatra/activerecord'
 require './config/environments'
+require './models/ritual_player'
 
-class Player < ActiveRecord::Base
-end
 
 get '/' do
   # Show current list of users.
 
   "Ritual"
-  Player.all
+  RitualPlayer.all.to_json
 end
 
 # Player routes
 get '/join/:id' do
   puts params[:id] + ' joined'
-  @player = Player.new()
-  @player.save
+  @player = RitualPlayer.create(uuid: "Hello", name: "HelloTwo")
+
 end
 
 get '/leave/:id' do
