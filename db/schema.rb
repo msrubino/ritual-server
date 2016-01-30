@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160130083104) do
+ActiveRecord::Schema.define(version: 20160130065750) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 20160130083104) do
   end
 
   create_table "ritual_games", force: :cascade do |t|
+    t.integer  "last_leader_at_ritual_number", default: 0, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -31,24 +32,21 @@ ActiveRecord::Schema.define(version: 20160130083104) do
     t.string  "uuid",           null: false
     t.string  "name",           null: false
     t.integer "ritual_game_id"
+    t.integer "ritual_id"
     t.integer "leader_id"
   end
 
   add_index "ritual_players", ["uuid"], name: "index_ritual_players_on_uuid", unique: true, using: :btree
 
-  create_table "ritual_response", force: :cascade do |t|
-    t.float   "response_time",    null: false
-    t.integer "ritual_player_id"
-    t.integer "ritual_id"
-  end
-
-  add_index "ritual_response", ["response_time"], name: "index_ritual_response_on_response_time", using: :btree
-
   create_table "ritual_responses", force: :cascade do |t|
-    t.float    "response_time", null: false
+    t.float    "response_time",    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "ritual_player_id"
+    t.integer  "ritual_id"
   end
+
+  add_index "ritual_responses", ["response_time"], name: "index_ritual_responses_on_response_time", using: :btree
 
   create_table "rituals", force: :cascade do |t|
     t.integer  "ritual_type",    null: false
@@ -60,7 +58,8 @@ ActiveRecord::Schema.define(version: 20160130083104) do
   add_index "rituals", ["starts_at"], name: "index_rituals_on_starts_at", using: :btree
 
   add_foreign_key "ritual_players", "ritual_games", on_delete: :cascade
-  add_foreign_key "ritual_response", "ritual_players"
-  add_foreign_key "ritual_response", "rituals"
+  add_foreign_key "ritual_players", "rituals"
+  add_foreign_key "ritual_responses", "ritual_players"
+  add_foreign_key "ritual_responses", "rituals"
   add_foreign_key "rituals", "ritual_games", on_delete: :cascade
 end

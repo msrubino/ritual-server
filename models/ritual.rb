@@ -8,7 +8,7 @@ class Ritual < ActiveRecord::Base
   validates :starts_at, presence: true
 
   def hasExpired?
-    expirationTime = :starts_at + :duration
+    expirationTime = self.starts_at + self.duration.seconds
     return Time.now > expirationTime
   end
 end

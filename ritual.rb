@@ -23,7 +23,6 @@ end
 
 # utility functions
 def getCurrentGame
-
   firstGame = RitualGame.first
   # if there's no game, need to create the game.
   if firstGame.nil? then firstGame = RitualGame.create end
@@ -74,7 +73,6 @@ end
 
 # Player routes --------------------------------------------------
 post '/join' do
-
   currentGame = getCurrentGame()
 
   # does the player already exist?
@@ -98,10 +96,16 @@ post '/join' do
 
   #currentGame.exportJSON()
   puts params[:uuid]
-  redirect '/director'
+
+  resp = {}
+  resp[:leader] = currentGame.leader
+  resp[:ritual] = currentGame.rituals.last
+  resp[:player] = player
+
+  resp.to_json
 end
 
-get '/leave' do
+post '/leave' do
 
   # is this a valid leaving player?
   leavingPlayer = RitualPlayer.find_by( uuid: params[:uuid] )
@@ -117,7 +121,7 @@ get '/leave' do
 end
 
 # Game routes --------------------------------------------------
-get '/claim_leadership' do
+post '/claim_leadership' do
   
   currentGame = getCurrentGame()
 
@@ -133,9 +137,15 @@ get '/claim_leadership' do
   currentGame.exportJSON()
 end
 
-get '/declare_ritual' do
+post '/declare_ritual' do
 
   currentGame = getCurrentGame()
+
+  # validate leader
+  uuid = params[:uuid]
+  if uuid != currentGame.leader.uuid 
+    return "You are not the leader."
+  end
 
   # create a new ritual.
   type      = params[:ritual_type]
@@ -147,28 +157,47 @@ get '/declare_ritual' do
   # add the players from the current game to the ritual, and add the ritual to the current game's rituals.
   newRitual.ritual_players = currentGame.ritual_players
   currentGame.rituals << newRitual
-
-  currentGame.exportJSON()
+  currentGame.save!
 end
 
-get '/perform_ritual/:UUID' do
-  performer = getPlayerByUUID( params[:UUID] )
+post '/performed_ritual' do
+  performer = getPlayerByUUID( params[:uuid] )
   ritual = getCurrentRitualOrNil()
-  ritualStartTime = ritual.starts_at
-
-  # TODO if the current ritual is nil for whatever reason, leave
   if ritual.nil? then return "oops" end
+
+  ritualStartTime = ritual.starts_at
 
   # check if player is in the current ritual
   if !ritual.ritual_players.include? performer then return "oops" end
 
   # if okay, player creates a ritual response and adds it to the ritual
   responseTime = Time.now - ritualStartTime;
-  response = RitualResponse.create( response_time: responseTime )
+  response = RitualResponse.create( ritual_player: performer, response_time: responseTime )
   
   ritual.ritual_responses << response
+  ritual.save!
+end
 
-  currentGame.exportJSON()
+get '/ritual_results' do
+  ritualGameId = params[:ritual_game_id]
+  begin
+    currentGame = RitualGame.find(ritualGameId)
+  rescue
+    return "No game found."
+  end
+
+  currentGame.updateLeader
+
+  first_response = currentGame.rituals.last.ritual_responses.first
+
+  winner = unless first_response.nil? then first_response.ritual_player else "" end
+  leader = currentGame.leader
+
+  resp = {}
+  resp[:winner] = winner
+  resp[:leader] = leader
+
+  resp.to_json
 end
 
 get '/sync' do
