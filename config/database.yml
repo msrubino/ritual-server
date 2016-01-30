@@ -1,6 +1,6 @@
 development:
   adapter: postgresql
-  database: development
+  database: ritualdb
   username: ritualuser
   password: ritualpassword
   host: localhost
