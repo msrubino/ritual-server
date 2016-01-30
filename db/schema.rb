@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160130065750) do
+ActiveRecord::Schema.define(version: 20160130083104) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,6 +34,14 @@ ActiveRecord::Schema.define(version: 20160130065750) do
 
   add_index "ritual_players", ["uuid"], name: "index_ritual_players_on_uuid", unique: true, using: :btree
 
+  create_table "ritual_response", force: :cascade do |t|
+    t.float   "response_time",    null: false
+    t.integer "ritual_player_id"
+    t.integer "ritual_id"
+  end
+
+  add_index "ritual_response", ["response_time"], name: "index_ritual_response_on_response_time", using: :btree
+
   create_table "rituals", force: :cascade do |t|
     t.integer  "ritual_type",    null: false
     t.float    "duration",       null: false
@@ -44,5 +52,7 @@ ActiveRecord::Schema.define(version: 20160130065750) do
   add_index "rituals", ["starts_at"], name: "index_rituals_on_starts_at", using: :btree
 
   add_foreign_key "ritual_players", "ritual_games", on_delete: :cascade
+  add_foreign_key "ritual_response", "ritual_players"
+  add_foreign_key "ritual_response", "rituals"
   add_foreign_key "rituals", "ritual_games", on_delete: :cascade
 end
