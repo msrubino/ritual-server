@@ -4,6 +4,24 @@ require './config/environments'
 Dir["./models/*.rb"].each {|file| require file }
 
 # helper functions --------------------------------------------------
+helpers do
+
+  def getRandomName
+    name = ""
+    syllables = ["do", "re", "mi", "fa", "so", "la", "ti"]
+    count = 2 + rand(4)
+    for i in 0..count
+      name += syllables.sample 
+    end
+    return name
+  end
+
+  def getRandomUUID
+    name = rand(99999999)
+  end
+end
+
+# utility functions
 def getCurrentGame
 
   firstGame = RitualGame.first
@@ -38,18 +56,24 @@ end
 
 # Admin routes --------------------------------------------------
 get '/director' do
+  @game       = getCurrentGame()
+  @players    = @game.ritual_players
+  @leader     = @game.hasLeader? ? @game.leader : nil
+  @leadername = !@leader.nil? ? @leader.name : "There is no leader."
 
+  erb :director 
 end
 
-get '/reset' do
-    Ritual.destroy_all
-    RitualPlayer.destroy_all
-    RitualGame.destroy_all
-    "All gone."
+post '/reset' do
+  Ritual.destroy_all
+  RitualPlayer.destroy_all
+  RitualGame.destroy_all
+  
+  redirect '/director'
 end
 
 # Player routes --------------------------------------------------
-get '/join' do
+post '/join' do
 
   currentGame = getCurrentGame()
 
@@ -66,11 +90,15 @@ get '/join' do
   end
 
   #Debug
+=begin
   playerCount = currentGame.ritual_players.length.to_s() 
   leaderName = currentGame.leader.name 
   puts "There are currently #{playerCount} players. The leader is #{leaderName}."
+=end
 
-  currentGame.exportJSON()
+  #currentGame.exportJSON()
+  puts params[:uuid]
+  redirect '/director'
 end
 
 get '/leave' do
