@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160130061237) do
+ActiveRecord::Schema.define(version: 20160130065750) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,4 +22,27 @@ ActiveRecord::Schema.define(version: 20160130061237) do
     t.datetime "updated_at"
   end
 
+  create_table "ritual_games", force: :cascade do |t|
+    t.integer "ritual_player_id", null: false
+  end
+
+  create_table "ritual_players", force: :cascade do |t|
+    t.string  "uuid",           null: false
+    t.string  "name",           null: false
+    t.integer "ritual_game_id"
+  end
+
+  add_index "ritual_players", ["uuid"], name: "index_ritual_players_on_uuid", unique: true, using: :btree
+
+  create_table "rituals", force: :cascade do |t|
+    t.integer  "ritual_type",    null: false
+    t.float    "duration",       null: false
+    t.datetime "starts_at",      null: false
+    t.integer  "ritual_game_id"
+  end
+
+  add_index "rituals", ["starts_at"], name: "index_rituals_on_starts_at", using: :btree
+
+  add_foreign_key "ritual_players", "ritual_games", on_delete: :cascade
+  add_foreign_key "rituals", "ritual_games", on_delete: :cascade
 end
