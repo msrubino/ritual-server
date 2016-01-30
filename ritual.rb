@@ -19,16 +19,16 @@ end
 
 get '/' do
   # Show current list of users.
-  puts db
 
   "Ritual"
-  db.to_s
-  @players = Player.all
+  Player.all
 end
 
 # Player routes
 get '/join/:id' do
   puts params[:id] + ' joined'
+  @player = Player.new()
+  @player.save
 end
 
 get '/leave/:id' do
