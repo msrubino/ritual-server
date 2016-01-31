@@ -34,7 +34,7 @@ class RitualGame < ActiveRecord::Base
     numRitualsPerformed = Ritual.count
 
     leaderIsDoneLeading = numRitualsPerformed % numRitualsPerLeader == 0
-    leaderHasNotChanged = last_leader_at_ritual_number != numRitualsPerformed
+    leaderHasNotChanged = self.last_leader_at_ritual_number != numRitualsPerformed
 
     if leaderIsDoneLeading and leaderHasNotChanged
       self.newLeader

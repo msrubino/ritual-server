@@ -24,7 +24,7 @@ end
 def getCurrentGame
   firstGame = RitualGame.first
   # if there's no game, need to create the game.
-  if firstGame.nil? then firstGame = RitualGame.create end
+  if firstGame.nil? then firstGame = RitualGame.create ( last_leader_at_ritual_number: 0 ) end
 
   return firstGame
 end
@@ -66,7 +66,7 @@ get '/reset' do
   #Ritual.delete_all
   #RitualPlayer.delete_all
   RitualGame.destroy_all
-  return "butrts"
+  return "Butts."
 end
 
 # Player routes --------------------------------------------------
