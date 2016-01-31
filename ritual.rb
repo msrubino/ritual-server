@@ -218,7 +218,12 @@ get '/current_ritual' do
   resp = {}
   resp[:leader] = currentGame.leader
   if !currentRitual.nil?
-    resp[:ritual] = currentRitual
+    resp[:ritual] = {}
+    currentRitual.attributes.each do |k, v|
+      resp[:ritual][k] = v
+    end
+
+    resp[:ritual][:time_until_start] = (currentRitual.starts_at - Time.current).seconds
   end
 
   resp.to_json
