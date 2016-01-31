@@ -162,6 +162,9 @@ end
 
 post '/performed_ritual' do
   performer = getPlayerByUUID( params[:uuid] )
+  performanceSpeed = params[:performance_speed]
+  gestureString = params[:gesture_string]
+
   ritual = getCurrentRitualOrNil()
   if ritual.nil? then return "oops" end
 
@@ -172,7 +175,7 @@ post '/performed_ritual' do
 
   # if okay, player creates a ritual response and adds it to the ritual
   responseTime = (Time.current - ritualStartTime).seconds;
-  response = RitualResponse.create( ritual: ritual, ritual_player: performer, response_time: responseTime )
+  response = RitualResponse.create( gesture_string: gestureString, ritual: ritual, ritual_player: performer, response_time: performanceSpeed )
   
   ritual.ritual_responses << response
   ritual.save!
