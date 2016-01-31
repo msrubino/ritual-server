@@ -139,6 +139,8 @@ post '/declare_ritual' do
 
   # validate leader
   uuid = params[:uuid]
+  gestureString = params[:gesture_string]
+
   if uuid != currentGame.leader.uuid 
     return "You are not the leader."
   end
@@ -152,7 +154,7 @@ post '/declare_ritual' do
   currentGame.setLeaderLapseTime( starts_at + duration.seconds + currentGame.lapseSeconds )
 
   # create ritual
-  newRitual = Ritual.create( ritual_leader: currentGame.leader, ritual_type: type, duration: duration, starts_at: starts_at )
+  newRitual = Ritual.create( gesture_string: gestureString, ritual_leader: currentGame.leader, ritual_type: type, duration: duration, starts_at: starts_at )
 
   # add the players from the current game to the ritual, and add the ritual to the current game's rituals.
   newRitual.ritual_players = currentGame.ritual_players
@@ -163,19 +165,15 @@ end
 post '/performed_ritual' do
   performer = getPlayerByUUID( params[:uuid] )
   performanceSpeed = params[:performance_speed]
-  gestureString = params[:gesture_string]
 
   ritual = getCurrentRitualOrNil()
   if ritual.nil? then return "oops" end
-
-  ritualStartTime = ritual.starts_at
 
   # check if player is in the current ritual
   if !ritual.ritual_players.include? performer then return "oops" end
 
   # if okay, player creates a ritual response and adds it to the ritual
-  responseTime = (Time.current - ritualStartTime).seconds;
-  response = RitualResponse.create( gesture_string: gestureString, ritual: ritual, ritual_player: performer, response_time: performanceSpeed )
+  response = RitualResponse.create( ritual: ritual, ritual_player: performer, response_time: performanceSpeed )
   
   ritual.ritual_responses << response
   ritual.save!
