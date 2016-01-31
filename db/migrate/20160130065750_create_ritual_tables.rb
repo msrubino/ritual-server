@@ -1,8 +1,6 @@
 class CreateRitualTables < ActiveRecord::Migration
   def change
     create_table :ritual_games do |t|
-      t.datetime :leader_lapse_time
-
       t.timestamps
     end
 
