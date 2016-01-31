@@ -63,8 +63,8 @@ ActiveRecord::Schema.define(version: 20160131092314) do
 
   add_foreign_key "ritual_players", "ritual_games", on_delete: :cascade
   add_foreign_key "ritual_players", "rituals"
-  add_foreign_key "ritual_responses", "ritual_players"
-  add_foreign_key "ritual_responses", "rituals"
+  add_foreign_key "ritual_responses", "ritual_players", on_delete: :cascade
+  add_foreign_key "ritual_responses", "rituals", on_delete: :cascade
   add_foreign_key "rituals", "ritual_games", on_delete: :cascade
   add_foreign_key "rituals", "ritual_players", column: "ritual_leader_id"
 end
