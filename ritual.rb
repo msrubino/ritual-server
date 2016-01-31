@@ -62,7 +62,7 @@ get '/director' do
   erb :director 
 end
 
-post '/reset' do
+get '/reset' do
   Ritual.destroy_all
   RitualPlayer.destroy_all
   RitualGame.destroy_all
