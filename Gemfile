@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-gem "sinatra"
-gem "shotgun"
-gem "pg"
 gem "activerecord"
+gem "pg"
+gem "shotgun"
+gem "sinatra"
 gem "sinatra-activerecord"
