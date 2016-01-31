@@ -41,8 +41,8 @@ class CreateRitualTables < ActiveRecord::Migration
       t.references :ritual_player
       t.references :ritual
 
-      t.foreign_key :ritual_players
-      t.foreign_key :rituals
+      t.foreign_key :ritual_players, on_delete: :cascade
+      t.foreign_key :rituals, on_delete: :cascade
 
       t.index :response_time
     end
