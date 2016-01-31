@@ -66,8 +66,6 @@ post '/reset' do
   Ritual.destroy_all
   RitualPlayer.destroy_all
   RitualGame.destroy_all
-  
-  redirect '/director'
 end
 
 # Player routes --------------------------------------------------
