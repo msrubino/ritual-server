@@ -63,9 +63,10 @@ get '/director' do
 end
 
 get '/reset' do
-  Ritual.destroy_all
-  RitualPlayer.destroy_all
+  #Ritual.delete_all
+  #RitualPlayer.delete_all
   RitualGame.destroy_all
+  return "butrts"
 end
 
 # Player routes --------------------------------------------------
@@ -198,7 +199,7 @@ get '/current_ritual' do
   lastRitual = currentGame.rituals.last
 
   if lastRitual.nil?
-    return "There are no rituals yet."
+    return ""
   end
 
   if !lastRitual.hasExpired?
@@ -221,4 +222,6 @@ get '/current_ritual' do
   end
 
   resp.to_json
+  #currentRitual.as_json( :include => [ :ritualType, :duration, :starts_at ] )
+
 end
