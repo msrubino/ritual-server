@@ -171,7 +171,7 @@ post '/performed_ritual' do
   if !ritual.ritual_players.include? performer then return "oops" end
 
   # if okay, player creates a ritual response and adds it to the ritual
-  responseTime = Time.current - ritualStartTime;
+  responseTime = (Time.current - ritualStartTime).seconds;
   response = RitualResponse.create( ritual_player: performer, response_time: responseTime )
   
   ritual.ritual_responses << response
