@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 20160130065750) do
 
   create_table "ritual_games", force: :cascade do |t|
     t.integer  "last_leader_at_ritual_number", default: 0, null: false
+    t.datetime "leader_lapse_time"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -49,10 +50,13 @@ ActiveRecord::Schema.define(version: 20160130065750) do
   add_index "ritual_responses", ["response_time"], name: "index_ritual_responses_on_response_time", using: :btree
 
   create_table "rituals", force: :cascade do |t|
-    t.integer  "ritual_type",    null: false
-    t.float    "duration",       null: false
-    t.datetime "starts_at",      null: false
+    t.integer  "ritual_type",      null: false
+    t.float    "duration",         null: false
+    t.datetime "starts_at",        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "ritual_game_id"
+    t.integer  "ritual_leader_id"
   end
 
   add_index "rituals", ["starts_at"], name: "index_rituals_on_starts_at", using: :btree
@@ -62,4 +66,5 @@ ActiveRecord::Schema.define(version: 20160130065750) do
   add_foreign_key "ritual_responses", "ritual_players"
   add_foreign_key "ritual_responses", "rituals"
   add_foreign_key "rituals", "ritual_games", on_delete: :cascade
+  add_foreign_key "rituals", "ritual_players", column: "ritual_leader_id"
 end

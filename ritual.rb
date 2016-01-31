@@ -5,7 +5,6 @@ Dir["./models/*.rb"].each {|file| require file }
 
 # helper functions --------------------------------------------------
 helpers do
-
   def getRandomName
     name = ""
     syllables = ["do", "re", "mi", "fa", "so", "la", "ti"]
@@ -75,27 +74,25 @@ end
 post '/join' do
   currentGame = getCurrentGame()
 
+  numPlayers = currentGame.ritual_players.count
+
   # does the player already exist?
   player = RitualPlayer.find_by( uuid: params[:uuid] )
   if player.nil?
     # if not, create player.
     player = RitualPlayer.create( uuid: params[:uuid], name: params[:name], ritual_game: currentGame )
+
+    if numPlayers == 1
+      currentGame.setLeaderLapseTimeNow
+    end
   end
 
   # assign player as leader if no leader assigned
   if currentGame.leader.nil?
-    currentGame.leader = currentGame.ritual_players.sample()
+    currentGame.newLeader
   end
 
-  #Debug
-=begin
-  playerCount = currentGame.ritual_players.length.to_s() 
-  leaderName = currentGame.leader.name 
-  puts "There are currently #{playerCount} players. The leader is #{leaderName}."
-=end
-
-  #currentGame.exportJSON()
-  puts params[:uuid]
+  currentGame.save!
 
   resp = {}
   resp[:leader] = currentGame.leader
@@ -149,10 +146,14 @@ post '/declare_ritual' do
 
   # create a new ritual.
   type      = params[:ritual_type]
-  duration  = params[:duration] 
-  starts_at = Time.now + Integer(params[:starts_in])
+  duration  = Integer(params[:duration])
+  starts_at = Time.current + (Integer(params[:starts_in])).seconds
 
-  newRitual = Ritual.create( ritual_type: type, duration: duration, starts_at: starts_at )
+  # set the leader's lapse time for the next ritual
+  currentGame.setLeaderLapseTime( starts_at + duration.seconds + currentGame.lapseSeconds )
+
+  # create ritual
+  newRitual = Ritual.create( ritual_leader: currentGame.leader, ritual_type: type, duration: duration, starts_at: starts_at )
 
   # add the players from the current game to the ritual, and add the ritual to the current game's rituals.
   newRitual.ritual_players = currentGame.ritual_players
@@ -171,7 +172,7 @@ post '/performed_ritual' do
   if !ritual.ritual_players.include? performer then return "oops" end
 
   # if okay, player creates a ritual response and adds it to the ritual
-  responseTime = Time.now - ritualStartTime;
+  responseTime = Time.current - ritualStartTime;
   response = RitualResponse.create( ritual_player: performer, response_time: responseTime )
   
   ritual.ritual_responses << response
@@ -179,13 +180,7 @@ post '/performed_ritual' do
 end
 
 get '/ritual_results' do
-  ritualGameId = params[:ritual_game_id]
-  begin
-    currentGame = RitualGame.find(ritualGameId)
-  rescue
-    return "No game found."
-  end
-
+  currentGame = getCurrentGame()
   currentGame.updateLeader
 
   first_response = currentGame.rituals.last.ritual_responses.first
@@ -200,9 +195,32 @@ get '/ritual_results' do
   resp.to_json
 end
 
-get '/sync' do
-  # PHASES
-  # during declare ritual phase...searching for the next ritual.
-  # during the ritual phase...nothing happening.
-  # during the post ritual phase...searching for the next ritual (unless there's no leader)
+get '/current_ritual' do
+  currentGame = getCurrentGame()
+  lastRitual = currentGame.rituals.last
+
+  if lastRitual.nil?
+    return "There are no rituals yet."
+  end
+
+  if !lastRitual.hasExpired?
+    currentRitual = lastRitual
+  end
+
+  # update leader if lapsed
+  lapseBegin = currentGame.leader_lapse_time - currentGame.lapseSeconds
+  lapseEnd = currentGame.leader_lapse_time
+
+  if Time.current > lapseEnd and lastRitual.created_at < lapseBegin
+    currentGame.newLeader
+    currentGame.save!
+  end
+
+  resp = {}
+  resp[:leader] = currentGame.leader
+  if !currentRitual.nil?
+    resp[:ritual] = currentRitual
+  end
+
+  resp.to_json
 end

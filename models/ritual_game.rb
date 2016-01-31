@@ -5,8 +5,28 @@ class RitualGame < ActiveRecord::Base
 
   validates :last_leader_at_ritual_number, presence: true, numericality: {greater_than_or_equal_to: 0}
 
+  def lapseSeconds
+    return 60.seconds
+  end
+
   def hasLeader?
     return !leader.nil?
+  end
+
+  def newLeader
+    self.leader = self.ritual_players.sample()
+    self.last_leader_at_ritual_number = Ritual.count
+    if self.ritual_players.count > 1
+      self.setLeaderLapseTimeNow
+    end
+  end
+
+  def setLeaderLapseTimeNow
+    self.leader_lapse_time = Time.current + self.lapseSeconds
+  end
+
+  def setLeaderLapseTime(time)
+    self.leader_lapse_time = time
   end
 
   def updateLeader
@@ -17,11 +37,10 @@ class RitualGame < ActiveRecord::Base
     leaderHasNotChanged = last_leader_at_ritual_number != numRitualsPerformed
 
     if leaderIsDoneLeading and leaderHasNotChanged
-      self.leader = ritual_players.sample()
-      self.last_leader_at_ritual_number = numRitualsPerformed
+      self.newLeader
     end
 
-    save!
+    self.save!
   end
 
   def exportJSON()

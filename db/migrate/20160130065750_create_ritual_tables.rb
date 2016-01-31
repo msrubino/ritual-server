@@ -2,6 +2,8 @@ class CreateRitualTables < ActiveRecord::Migration
   def change
     create_table :ritual_games do |t|
       t.integer :last_leader_at_ritual_number, null: false, default: 0
+      t.datetime :leader_lapse_time
+
       t.timestamps
     end
 
@@ -9,6 +11,7 @@ class CreateRitualTables < ActiveRecord::Migration
       t.integer :ritual_type, null: false
       t.float :duration, null: false
       t.datetime :starts_at, null: false
+      t.timestamps
 
       t.references :ritual_game
       t.foreign_key :ritual_games, on_delete: :cascade
@@ -30,6 +33,9 @@ class CreateRitualTables < ActiveRecord::Migration
 
       t.index :uuid, unique: true
     end
+
+    add_reference :rituals, :ritual_leader, references: :ritual_player
+    add_foreign_key :rituals, :ritual_players, column: :ritual_leader_id
 
     create_table :ritual_responses do |t|
       t.float :response_time, null: false
