@@ -6,7 +6,7 @@ class RitualGame < ActiveRecord::Base
   validates :last_leader_at_ritual_number, presence: true, numericality: {greater_than_or_equal_to: 0}
 
   def lapseSeconds
-    return 60.seconds
+    return 15.seconds
   end
 
   def hasLeader?

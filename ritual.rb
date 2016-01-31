@@ -198,17 +198,23 @@ get '/current_ritual' do
   currentGame = getCurrentGame()
   lastRitual = currentGame.rituals.last
 
+  lapseBegin = currentGame.leader_lapse_time - currentGame.lapseSeconds
+  lapseEnd = currentGame.leader_lapse_time
+
   if lastRitual.nil?
-    return ""
+    if Time.current > lapseEnd
+      currentGame.newLeader
+      currentGame.save
+    end
+
+    resp = {}
+    resp[:leader] = currentGame.leader
+    return resp.to_json
   end
 
   if !lastRitual.hasExpired?
     currentRitual = lastRitual
   end
-
-  # update leader if lapsed
-  lapseBegin = currentGame.leader_lapse_time - currentGame.lapseSeconds
-  lapseEnd = currentGame.leader_lapse_time
 
   if Time.current > lapseEnd and lastRitual.created_at < lapseBegin
     currentGame.newLeader
