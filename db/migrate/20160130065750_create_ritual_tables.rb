@@ -7,6 +7,7 @@ class CreateRitualTables < ActiveRecord::Migration
     create_table :rituals do |t|
       t.integer :ritual_type, null: false
       t.float :duration, null: false
+      t.string :gesture_string
       t.datetime :starts_at, null: false
       t.timestamps
 

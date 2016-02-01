@@ -14,7 +14,13 @@ class RitualGame < ActiveRecord::Base
   end
 
   def newLeader
-    self.leader = self.ritual_players.sample()
+    newLeader = self.ritual_players.sample()
+    while newLeader == self.leader do
+      newLeader = self.ritual_players.sample()
+    end
+
+    self.leader = newLeader
+  
     self.last_leader_at_ritual_number = Ritual.count
     if self.ritual_players.count > 1
       self.setLeaderLapseTimeNow
