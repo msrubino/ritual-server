@@ -30,7 +30,7 @@ class RitualGame < ActiveRecord::Base
   end
 
   def updateLeader
-    numRitualsPerLeader = 3
+    numRitualsPerLeader = 1
     numRitualsPerformed = Ritual.count
 
     leaderIsDoneLeading = numRitualsPerformed % numRitualsPerLeader == 0
